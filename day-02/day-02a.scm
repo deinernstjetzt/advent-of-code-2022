@@ -38,8 +38,38 @@
 (define (round-score move)
   (+ (round-outcome move) (round-bonus move)))
 
+(define (find-move opponent action)
+  (cond
+   ((eq? action 'win)
+    (cond
+     ((eq? opponent 'rock) 'paper)
+     ((eq? opponent 'paper) 'scissors)
+     ((eq? opponent 'scissors) 'rock)))
+   ((eq? action 'draw) opponent)
+   ((eq? action 'lose)
+    (cond
+     ((eq? opponent 'rock) 'scissors)
+     ((eq? opponent 'paper) 'rock)
+     ((eq? opponent 'scissors) 'paper)))))
+
+(define (translate-to-action a)
+  (cond
+   ((eq? a 'rock) 'lose)
+   ((eq? a 'paper) 'draw)
+   ((eq? a 'scissors) 'win)))
+
+(define (score-move-part-2 move)
+  (let* ((opponent (car move))
+	(action (translate-to-action (cdr move)))
+	(my-move (find-move opponent action)))
+    (round-score (cons opponent my-move))))
+
 (let* ((input (load-input-from-file "input.txt"))
        (score (map round-score input))
-       (result (apply + score)))
+       (score-part-2 (map score-move-part-2 input))
+       (result (apply + score))
+       (result-part-2 (apply + score-part-2)))
   (display result)
+  (display #\newline)
+  (display result-part-2)
   (display #\newline))
