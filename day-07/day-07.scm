@@ -123,3 +123,20 @@
         ((null? items) size)
         ((eq? (caar items) 'dir) (loop (+ size (sum-of-dir-size-below (car items) limit)) (cdr items)))
         (else (loop size (cdr items)))))))
+
+(define (find-smallest-dir-of-min-size dir min-required)
+  (let ((own-size (dir-size dir)))
+    (let loop ((items (caddr dir)) (size own-size))
+      (cond
+        ((null? items) (if (< size min-required) +Inf.0 size))
+        ((eq? (caar items) 'dir) (loop (cdr items) (min size (find-smallest-dir-of-min-size (car items) min-required))))
+        (else (loop (cdr items) size))))))
+
+(let* ((fs-tree (build-tree (parse-commands (load-lines-of-file "input.txt"))))
+       (answer-a (sum-of-dir-size-below fs-tree 100000))
+       (req-space (- 30000000 (- 70000000 (dir-size fs-tree))))
+       (answer-b (find-smallest-dir-of-min-size fs-tree req-space)))
+    (display answer-a)
+    (newline)
+    (display answer-b)
+    (newline))
