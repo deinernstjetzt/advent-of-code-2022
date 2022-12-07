@@ -10,22 +10,26 @@
           #t
           (sublist-contains? (cdr ls) (- max-len 1) item))))
 
-(define (first-four-distinct? ls)
+(define (first-n-distinct? ls n)
   (let loop ((ls ls) (i 0))
     (cond
-      ((eq? i 4) #t)
+      ((eq? i n) #t)
       ((null? ls) #f)
-      ((sublist-contains? (cdr ls) (- 3 i) (car ls)) #f)
+      ((sublist-contains? (cdr ls) (- n i 1) (car ls)) #f)
       (else (loop (cdr ls) (+ i 1))))))
 
-(define (find-marker chars)
+(define (find-marker chars marker-size)
   (let loop ((chars chars) (prev-read '()) (i 0))
     (cond
-      ((first-four-distinct? prev-read) i)
+      ((first-n-distinct? prev-read marker-size) i)
       ((null? chars) -1)
       (else (loop (cdr chars) (cons (car chars) prev-read) (+ i 1))))))
 
 (let* ((input (load-file "input.txt"))
-       (marker (find-marker (string->list input))))
-  (display marker)
+       (input-ls (string->list input))
+       (packet-marker (find-marker input-ls 4))
+       (message-marker (find-marker input-ls 14)))
+  (display packet-marker)
+  (newline)
+  (display message-marker)
   (newline))
