@@ -22,10 +22,37 @@
           ((eq? i to) (loop (cdr ls) (cons (cons container (car ls)) res) (+ i 1) container))
           (else (loop (cdr ls) (cons (car ls) res) (+ i 1) container))))))
 
+(define (move-n count from to)
+  (let loop ((ls '()) (i 0) (from from))
+    (if (< i count)
+        (loop (cons (car from) ls) (+ i 1) (cdr from))
+        (let loop2 ((ls ls) (to to))
+          (if (null? ls)
+              (cons from to)
+              (loop2 (cdr ls) (cons (car ls) to)))))))
+
+(define (exec-move-snd stacks count from to)
+  (let* ((from-stack (nth stacks (- from 1)))
+         (to-stack (nth stacks (- to 1)))
+         (res (move-n count from-stack to-stack))
+         (new-from (car res))
+         (new-to (cdr res)))
+    (let loop ((ls '()) (i 1) (stacks stacks))
+      (cond
+        ((null? stacks) (reverse ls))
+        ((eq? i from) (loop (cons new-from ls) (+ i 1) (cdr stacks)))
+        ((eq? i to) (loop (cons new-to ls) (+ i 1) (cdr stacks)))
+        (else (loop (cons (car stacks) ls) (+ i 1) (cdr stacks)))))))
+
 (define (exec-moves stacks moves)
   (if (null? moves)
       stacks
       (exec-moves (exec-move stacks (caar moves) (cadar moves) (caddar moves)) (cdr moves))))
+
+(define (exec-moves-snd stacks moves)
+  (if (null? moves)
+      stacks
+      (exec-moves-snd (exec-move-snd stacks (caar moves) (cadar moves) (caddar moves)) (cdr moves))))
 
 (define (stack-tops stacks)
   (if (null? stacks)
@@ -34,6 +61,9 @@
 
 (let* ((stacks (load-lists-from-file "stacks.txt"))
        (moves (load-lists-from-file "moves.txt"))
-       (res (exec-moves stacks moves)))
+       (res (exec-moves stacks moves))
+       (res-snd (exec-moves-snd stacks moves)))
   (display (stack-tops res))
+  (newline)
+  (display (stack-tops res-snd))
   (newline))
