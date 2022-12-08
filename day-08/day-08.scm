@@ -42,6 +42,21 @@
       (tree-visible-in-dir? grid row col 0 1)
       (tree-visible-in-dir? grid row col 0 -1)))
 
+(define (scenic-score-in-dir grid row col dir-r dir-c)
+  (let ((nei (neighbours-in-dir grid row col dir-r dir-c))
+        (self (grid-at grid row col)))
+    (let loop ((i 0) (ls nei))
+      (cond
+       ((null? ls) i)
+       ((<= self (car ls)) (+ i 1))
+       (else (loop (+ i 1) (cdr ls)))))))
+
+(define (scenic-score grid row col)
+  (* (scenic-score-in-dir grid row col 1 0)
+     (scenic-score-in-dir grid row col -1 0)
+     (scenic-score-in-dir grid row col 0 1)
+     (scenic-score-in-dir grid row col 0 -1)))
+
 (define (map-grid-items grid fn)
   (let loop ((i 0) (j 0) (cur (vector-ref grid 0)) (res '()))
     (if (or (>= j (vector-length cur)) (>= i (vector-length grid)))
@@ -50,7 +65,12 @@
             (loop (+ i 1) 0 (vector-ref grid i) res))
         (loop i (+ j 1) cur (cons (fn i j (vector-ref cur j)) res)))))
 
-(define (solve-a)
+(define (solve)
   (let* ((grid (load-grid "input.txt"))
-         (fn (lambda (i j item) (if (tree-visible? grid i j) 1 0))))
-    (apply + (map-grid-items grid fn))))
+         (fn (lambda (i j item) (if (tree-visible? grid i j) 1 0)))
+         (res-a (apply + (map-grid-items grid fn)))
+         (res-b (apply max (map-grid-items grid (lambda (i j item) (scenic-score grid i j))))))
+    (display res-a)
+    (newline)
+    (display res-b)
+    (newline)))
