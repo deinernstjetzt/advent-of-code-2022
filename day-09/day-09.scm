@@ -44,17 +44,10 @@
    ((> n 0) 1)
    (else 0)))
 
-(define (pos-x pos) (car pos))
-
-(define (pos-y pos) (cadr pos))
-
 (define (next-tail-pos head tail)
   (if (adjacent? head tail)
       tail
-      (list (+ (pos-x tail)
-	       (sgn (- (pos-x head) (pos-x tail))))
-	    (+ (pos-y tail)
-	       (sgn (- (pos-y head) (pos-y tail)))))))
+      (map + tail (map sgn (map - head tail)))))
 
 (define (next-head-pos head move)
   (cond
