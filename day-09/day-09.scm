@@ -61,17 +61,6 @@
    ((eq? move 'l) (map - head '(1 0)))
    ((eq? move 'r) (map + head '(1 0)))))
 
-(define (tail-positions moves)
-  (let loop ((head '(0 0))
-	     (tail '(0 0))
-	     (moves moves)
-	     (res '((0 0))))
-    (if (null? moves)
-	(distinct res)
-	(let* ((next-head (next-head-pos head (car moves)))
-	       (next-tail (next-tail-pos next-head tail)))
-	  (loop next-head next-tail (cdr moves) (cons next-tail res))))))
-
 (define (next-chain-position chain move)
   (let ((first-head (next-head-pos (car chain) move)))
     (let loop ((cur-head first-head)
@@ -93,7 +82,7 @@
 	  (loop next-chain (cdr moves) (cons last-item res))))))
 
 (let* ((input (load-input "input.txt"))
-       (tail-pos (tail-positions input))
+       (tail-pos (tail-positions-chain input 2))
        (tail-pos-chain (tail-positions-chain input 10)))
   (display (length tail-pos))
   (newline)
